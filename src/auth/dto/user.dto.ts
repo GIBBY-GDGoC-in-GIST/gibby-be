@@ -2,9 +2,10 @@ import { IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class UserDto {
+    @IsOptional()
     @IsString()
     @ApiProperty({description:'이름', default: 'Hong Gil-dong'})
-    name: string;
+    name?: string;
 
     @IsString()
     @ApiProperty({description:'이메일', default: 'test@gmail.com'})
