@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto/user.dto';
@@ -49,6 +49,27 @@ export class AuthService {
         createdAt: true, 
       },
     });
+    return user;
+  }
+
+  async updateUserProfile(e: string, userDto: UserDto) {
+    const hashedPassword = await bcrypt.hash(userDto.password, 10);
+    const user = await this.prisma.user.update({
+      where: { email: e }, 
+      data: {
+        name: userDto.name!,
+        password: hashedPassword,
+      }, 
+      select: { 
+        email: true,
+        createdAt: true,
+        name: true,
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with email: ${e} not found.`);
+    }
     return user;
   }
 }

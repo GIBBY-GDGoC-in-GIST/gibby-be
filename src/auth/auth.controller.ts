@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Request, UseGuards, NotFoundException, Get } from '@nestjs/common';
+import { Controller, Post, Body, Request, UseGuards, NotFoundException, Get, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { User } from '@prisma/client';
 
 @ApiTags('User')
 @Controller('auth')
@@ -30,6 +31,14 @@ export class AuthController {
   @ApiOperation({ summary: '유저 정보 조회', description: '로그인한 유저의 정보를 조회합니다.',})
   async profile(@Request() req: any) {
     return this.authService.findUserProfile(req.user.email);
+  }
+
+  @Patch('update')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '유저 정보 수정', description: '로그인한 유저의 정보를 수정합니다.',})
+  async update(@Request() req: any, @Body() userDto: UserDto) {
+    const updatedUser= await this.authService.updateUserProfile(req.user.email, userDto,);
+    return updatedUser;
   }
 
 
